@@ -60,9 +60,10 @@
       updateFieldIfNotNull('Orientation_b', event.beta);
       updateFieldIfNotNull('Orientation_g', event.gamma);
 
-      var multiplied = event.alpha * event.beta * event.gamma;
-      var log = Math.log(multiplied) * 10;
-      var limit = !isFinite(log) || log > 50 ? 50 : log;
+      var multiplied = Math.abs(event.alpha * event.beta * event.gamma);
+      var low = multiplied < 1 ? 1 : multiplied;
+      var log = Math.log(low) * 10;
+      var limit = log > 50 ? 50 : log;
       updateFilter(limit);
     }
 
@@ -117,14 +118,6 @@
       ) {
         DeviceMotionEvent.requestPermission();
       }
-
-      // var intervalId = setInterval(function () {
-      //   var multiplied = Math.random() * 360 * 360 * 360;
-      //   var log = Math.log(multiplied) * 10;
-      //   var limit = log > 50 ? 50 : log;
-      //   updateFilter(limit);
-      // }, 1000);
-
 
       window.addEventListener("deviceorientation", handleOrientation);
       demo_button.remove();
