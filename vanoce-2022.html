@@ -5,7 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Demo - The Web's Sixth Sense: A Study of Scripts Accessing Smartphone Sensors</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <title>JavaScript Sensor Access Demo</title>
   <style>
     #demo-div {
@@ -43,7 +44,6 @@
     <div class="p-3 mb-2 bg-secondary" id="demo-div">
       <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start the demo</a>
 
-
       <h4 style="margin-top:0.75rem;">Orientation</h4>
       <ul>
         <li>X-axis (&beta;): <span id="Orientation_b">0</span><span>&deg;</span></li>
@@ -59,17 +59,56 @@
       updateFieldIfNotNull('Orientation_a', event.alpha);
       updateFieldIfNotNull('Orientation_b', event.beta);
       updateFieldIfNotNull('Orientation_g', event.gamma);
+
+      var multiplied = event.alpha * event.beta * event.gamma;
+      var log = Math.log(multiplied) * 10;
+      var limit = !isFinite(log) || log > 50 ? 50 : log;
+      updateFilter(limit);
     }
 
-    function updateFieldIfNotNull(fieldName, value, precision = 10) {
+    function updateFieldIfNotNull(fieldName, value, precision = 1) {
       if (value != null)
         document.getElementById(fieldName).innerHTML = value.toFixed(precision);
     }
 
-    let is_running = false;
     let demo_button = document.getElementById("start_demo");
+
+    var audio = new Audio();
+    audio.controls = true;
+    audio.loop = true;
+    audio.crossOrigin = "anonymous";
+
+    let filter;
+
+    function updateFilter(value) {
+      filter.gain.value = value;
+    }
+
     demo_button.onclick = function (e) {
       e.preventDefault();
+
+
+      //////////////////
+
+      audio.src = ".\\ttsMP3.com_VoiceText_2022-12-3_13_21_39.mp3";
+      document.getElementById('demo-div').appendChild(audio);
+      audio.autoplay = true;
+
+
+      const audioContext = new AudioContext();
+      filter = audioContext.createBiquadFilter();
+      filter.type = "lowshelf";
+      filter.frequency.value = 370;
+      filter.gain.value = 50;
+
+      const audioSource = audioContext.createMediaElementSource(audio);
+
+      audioSource.connect(filter);
+      filter.connect(audioContext.destination);
+
+
+
+      ///////////////////////
 
       // Request permission for iOS 13+ devices
       if (
@@ -79,19 +118,16 @@
         DeviceMotionEvent.requestPermission();
       }
 
-      if (is_running) {
-        window.removeEventListener("deviceorientation", handleOrientation);
-        demo_button.innerHTML = "Start demo";
-        demo_button.classList.add('btn-success');
-        demo_button.classList.remove('btn-danger');
-        is_running = false;
-      } else {
-        window.addEventListener("deviceorientation", handleOrientation);
-        document.getElementById("start_demo").innerHTML = "Stop demo";
-        demo_button.classList.remove('btn-success');
-        demo_button.classList.add('btn-danger');
-        is_running = true;
-      }
+      // var intervalId = setInterval(function () {
+      //   var multiplied = Math.random() * 360 * 360 * 360;
+      //   var log = Math.log(multiplied) * 10;
+      //   var limit = log > 50 ? 50 : log;
+      //   updateFilter(limit);
+      // }, 1000);
+
+
+      window.addEventListener("deviceorientation", handleOrientation);
+      demo_button.remove();
     };
 
   </script>
