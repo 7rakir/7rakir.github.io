@@ -25,11 +25,36 @@
       justify-content: center;
     }
 
+    main>* {
+      margin: 1rem 0;
+    }
+
     .orientation {
       flex-grow: 1;
       text-align: center;
       font-size: 8vw;
       margin: 0 2vw;
+    }
+
+    #message {
+      flex-grow: 1;
+      text-align: center;
+      font-size: 12vw;
+      margin: 0 2vw;
+      color: rgb(25, 135, 84);
+      font-weight: bold;
+    }
+
+    #code {
+      text-transform: uppercase;
+      background-color: rgb(36, 36, 36);
+      font-size: 12vw;
+      color: rgb(201, 255, 199);
+      border: 2px solid rgb(25, 135, 84);;
+    }
+
+    #code::placeholder {
+      color: rgb(201, 255, 199);
     }
 
     .btn {
@@ -49,6 +74,16 @@
     .hidden {
       display: none;
     }
+
+    .blink_me {
+      animation: blinker 1s linear infinite;
+    }
+
+    @keyframes blinker {
+      50% {
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 
@@ -66,6 +101,10 @@
     <input id="alpha" oninput="inputChange()" value="0" hidden />
     <input id="beta" oninput="inputChange()" value="0" hidden />
     <input id="gamma" oninput="inputChange()" value="0" hidden />
+
+    <input id="code" oninput="inputCodeChange()" placeholder="heslo" class="hidden" maxlength="10" />
+
+    <div id="message" class="hidden blink_me">Veselé Vánoce</div>
   </main>
 
   <script>
@@ -86,7 +125,8 @@
 
     const button = document.getElementById("button");
     const buttonStop = document.getElementById("button-stop");
-
+    const code = document.getElementById("code");
+    const message = document.getElementById("message");
 
     let noiseGain;
     let audio;
@@ -100,6 +140,21 @@
       var beta = document.getElementById('beta').value || 0;
       var gamma = document.getElementById('gamma').value || 0;
       applyChange(parseFloat(alpha), parseFloat(beta), parseFloat(gamma));
+    }
+
+    function inputCodeChange() {
+      var value = code.value || "";
+      var value = value.split(' ').join('');
+      if (value.toUpperCase() == "BZUMBZUM") {
+        message.classList.remove("hidden");
+        document.getElementById("demo-div").classList.add("hidden");
+        buttonStop.classList.add("hidden");
+        code.classList.add("hidden");
+        window.removeEventListener("deviceorientation", handleOrientation);
+        stopAudio();
+        var success = new Audio(".\\success.mp3"); // buffers automatically when created
+        success.play();
+      }
     }
 
     function applyChange(alpha, beta, gama) {
@@ -187,6 +242,7 @@
       window.addEventListener("deviceorientation", handleOrientation);
       button.remove();
       buttonStop.classList.remove("hidden");
+      code.classList.remove("hidden");
     };
 
     buttonStop.onclick = function (e) {
