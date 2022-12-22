@@ -91,9 +91,9 @@
     let noiseGain;
     let audio;
 
-    const targetAlpha = 24;
-    const targetBeta = 12;
-    const targetGamma = 22;
+    const targetAlpha = 22;
+    const targetBeta = 24;
+    const targetGamma = 12;
 
     function inputChange(value) {
       var alpha = document.getElementById('alpha').value || 0;
@@ -104,7 +104,7 @@
 
     function applyChange(alpha, beta, gama) {
       var absoluteSum = Math.abs(alpha - targetAlpha) + Math.abs(beta - targetBeta) + Math.abs(gama - targetGamma);
-      var shrinkage = 1.0 / 1;
+      var shrinkage = 1.0 / 10;
       var volume = 1 - (shrinkage / (shrinkage + absoluteSum))
       updateVolume(volume);
     }
