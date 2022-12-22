@@ -4,13 +4,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Demo - The Web's Sixth Sense: A Study of Scripts Accessing Smartphone Sensors</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-  <title>JavaScript Sensor Access Demo</title>
+  <title>Vánoce</title>
   <style>
     body {
       margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      background-color: rgb(36, 36, 36);
+      color: rgb(201, 255, 199);
     }
 
     main {
@@ -31,22 +31,41 @@
       font-size: 8vw;
       margin: 0 2vw;
     }
+
+    .btn {
+      padding-top: 0.25rem !important;
+      padding-bottom: 0.25rem !important;
+      text-align: center;
+      background-color: rgb(25, 135, 84);
+      color: rgb(201, 255, 199);
+      cursor: pointer;
+      display: block;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      line-height: 1.5;
+      font-size: 4vw;
+    }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
   <main role="main">
     <div class="orientation-group" id="demo-div">
-      <div class="orientation"><span id="Orientation_b">-180.0</span><span>&deg;</span></div>
-      <div class="orientation"><span id="Orientation_g">-180.0</span><span>&deg;</span></div>
-      <div class="orientation"><span id="Orientation_a">-180.0</span><span>&deg;</span></div>
+      <div class="orientation"><span id="Orientation_b">0</span><span>&deg;</span></div>
+      <div class="orientation"><span id="Orientation_g">0</span><span>&deg;</span></div>
+      <div class="orientation"><span id="Orientation_a">0</span><span>&deg;</span></div>
     </div>
 
-    <a id="start_demo" class="btn btn-lg btn-success py-1" href="#" role="button">Start</a>
+    <a id="button" class="btn btn-lg btn-success py-1" href="#" role="button">Start</a>
+    <a id="button-stop" class="btn btn-lg btn-success py-1 hidden" href="#" role="button">Stop</a>
 
-    <input id="alpha" oninput="inputChange()" value="0" />
-    <input id="beta" oninput="inputChange()" value="0" />
-    <input id="gamma" oninput="inputChange()" value="0" />
+    <input id="alpha" oninput="inputChange()" value="0" hidden />
+    <input id="beta" oninput="inputChange()" value="0" hidden />
+    <input id="gamma" oninput="inputChange()" value="0" hidden />
   </main>
 
   <script>
@@ -65,21 +84,27 @@
         document.getElementById(fieldName).innerHTML = value.toFixed(precision);
     }
 
-    let demo_button = document.getElementById("start_demo");
+    const button = document.getElementById("button");
+    const buttonStop = document.getElementById("button-stop");
+
 
     let noiseGain;
     let audio;
 
+    const targetAlpha = 24;
+    const targetBeta = 12;
+    const targetGamma = 22;
+
     function inputChange(value) {
-      var alpha = document.getElementById('alpha').value;
-      var beta = document.getElementById('beta').value;
-      var gamma = document.getElementById('gamma').value;
+      var alpha = document.getElementById('alpha').value || 0;
+      var beta = document.getElementById('beta').value || 0;
+      var gamma = document.getElementById('gamma').value || 0;
       applyChange(parseFloat(alpha), parseFloat(beta), parseFloat(gamma));
     }
 
     function applyChange(alpha, beta, gama) {
-      var absoluteSum = Math.abs(alpha) + Math.abs(beta) + Math.abs(gama);
-      var shrinkage = 1.0 / 2;
+      var absoluteSum = Math.abs(alpha - targetAlpha) + Math.abs(beta - targetBeta) + Math.abs(gama - targetGamma);
+      var shrinkage = 1.0 / 1.5;
       var volume = 1 - (shrinkage / (shrinkage + absoluteSum))
       updateVolume(volume);
     }
@@ -87,6 +112,11 @@
     function updateVolume(value) { // 0 - 1
       noiseGain.gain.value = value;
       audio.volume = 1 - value;
+    }
+
+    function stopAudio() {
+      noiseGain.gain.value = 0;
+      audio.volume = 0;
     }
 
     function createNoise(audioContext) {
@@ -116,13 +146,14 @@
       audio.controls = true;
       audio.loop = true;
       audio.crossOrigin = "anonymous";
-      audio.src = ".\\ttsMP3.com_VoiceText_2022-12-3_13_21_39.mp3";
+      audio.src = ".\\komarisezenili.aac";
+      audio.hidden = true;
       document.getElementById('demo-div').appendChild(audio);
       audio.autoplay = true;
       return audio;
     }
 
-    demo_button.onclick = function (e) {
+    button.onclick = function (e) {
       e.preventDefault();
 
       //////////////////
@@ -154,8 +185,16 @@
       }
 
       window.addEventListener("deviceorientation", handleOrientation);
-      demo_button.remove();
+      button.remove();
+      buttonStop.classList.remove("hidden");
     };
+
+    buttonStop.onclick = function (e) {
+      e.preventDefault();
+
+      window.removeEventListener("deviceorientation", handleOrientation);
+      stopAudio();
+    }
 
   </script>
 </body>
