@@ -63,9 +63,9 @@
     <a id="button" class="btn btn-lg btn-success py-1" href="#" role="button">Start</a>
     <a id="button-stop" class="btn btn-lg btn-success py-1 hidden" href="#" role="button">Stop</a>
 
-    <input id="alpha" oninput="inputChange()" value="0" hidden />
-    <input id="beta" oninput="inputChange()" value="0" hidden />
-    <input id="gamma" oninput="inputChange()" value="0" hidden />
+    <input id="alpha" oninput="inputChange()" value="0" />
+    <input id="beta" oninput="inputChange()" value="0" />
+    <input id="gamma" oninput="inputChange()" value="0" />
   </main>
 
   <script>
@@ -104,7 +104,7 @@
 
     function applyChange(alpha, beta, gama) {
       var absoluteSum = Math.abs(alpha - targetAlpha) + Math.abs(beta - targetBeta) + Math.abs(gama - targetGamma);
-      var shrinkage = 1.0 / 1.5;
+      var shrinkage = 1.0 / 1;
       var volume = 1 - (shrinkage / (shrinkage + absoluteSum))
       updateVolume(volume);
     }
